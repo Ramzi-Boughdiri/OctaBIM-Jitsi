@@ -1,6 +1,27 @@
 version: '3'
 
 services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:8080"
+      - "--entrypoints.websecure.address=:8443"
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.le.acme.email=contact@octa-bim.shop"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/letsencrypt"
+    restart: unless-stopped
+    networks:
+      - jitsi
+
   web:
     image: jitsi/web:stable-8719
     restart: unless-stopped
@@ -13,26 +34,39 @@ services:
       - ./web-custom:/usr/share/jitsi-meet
       - ./interface_config:/interface_config
     labels:
-      dokploy.expose: "true"
-      dokploy.ssl: "true"
-      dokploy.domain: "meet.octa-bim.shop"
+      - "traefik.enable=true"
+      - "traefik.http.routers.jitsi.rule=Host(`meet.octa-bim.shop`)"
+      - "traefik.http.routers.jitsi.entrypoints=websecure"
+      - "traefik.http.routers.jitsi.tls.certresolver=le"
+    networks:
+      - jitsi
 
   prosody:
     image: jitsi/prosody:stable-8719
     restart: unless-stopped
     volumes:
       - ./prosody-config:/config
+    networks:
+      - jitsi
 
   jicofo:
     image: jitsi/jicofo:stable-8719
     restart: unless-stopped
     volumes:
       - ./jicofo-config:/config
+    networks:
+      - jitsi
 
   jvb:
     image: jitsi/jvb:stable-8719
     restart: unless-stopped
     ports:
-      - '10000:10000/udp'
+      - "10000:10000/udp"
     volumes:
       - ./jvb-config:/config
+    networks:
+      - jitsi
+
+networks:
+  jitsi:
+    driver: bridge
