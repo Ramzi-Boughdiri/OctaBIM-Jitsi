@@ -1,9 +1,38 @@
 version: '3'
 
 services:
+  prosody:
+    image: jitsi/prosody:stable-8719
+    restart: always
+    expose:
+      - '5222'
+      - '5347'
+      - '5280'
+    volumes:
+      - ./prosody/config:/config
+
+  jicofo:
+    image: jitsi/jicofo:stable-8719
+    restart: always
+    depends_on:
+      - prosody
+
+  jvb:
+    image: jitsi/jvb:stable-8719
+    restart: always
+    depends_on:
+      - prosody
+    environment:
+      - JVB_STUN_SERVERS=meet-octo-turn.octa-bim.shop:3478  # modifie si besoin
+      - JVB_ENABLE_APIS=rest,colibri
+
   web:
     image: jitsi/web:stable-8719
     restart: always
+    depends_on:
+      - prosody
+      - jicofo
+      - jvb
     volumes:
       - ./web/custom:/usr/share/jitsi-meet/custom
     environment:
@@ -12,4 +41,3 @@ services:
       dokploy.expose: "true"
       dokploy.ssl: "true"
       dokploy.domain: "meet.octa-bim.shop"
-
