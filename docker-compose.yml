@@ -22,9 +22,6 @@ services:
     restart: always
     depends_on:
       - prosody
-    environment:
-      - JVB_STUN_SERVERS=meet-octo-turn.octa-bim.shop:3478  # modifie si besoin
-      - JVB_ENABLE_APIS=rest,colibri
 
   web:
     image: jitsi/web:stable-8719
