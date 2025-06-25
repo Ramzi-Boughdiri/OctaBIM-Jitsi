@@ -4,9 +4,6 @@ services:
   web:
     image: jitsi/web:stable-8719
     restart: always
-    ports:
-      - '80:80'
-      - '443:443'
     volumes:
       - ./web/custom:/usr/share/jitsi-meet/custom
     environment:
@@ -14,3 +11,7 @@ services:
       - LETSENCRYPT_DOMAIN=meet.octa-bim.shop
       - LETSENCRYPT_EMAIL=contact@octa-bim.shop
       - PUBLIC_URL=https://meet.octa-bim.shop
+    labels:
+      dokploy.expose: "true"
+      dokploy.ssl: "true"
+      dokploy.domain: "meet.octa-bim.shop"
