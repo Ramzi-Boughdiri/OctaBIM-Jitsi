@@ -7,11 +7,9 @@ services:
     volumes:
       - ./web/custom:/usr/share/jitsi-meet/custom
     environment:
-      - ENABLE_LETSENCRYPT=1
-      - LETSENCRYPT_DOMAIN=meet.octa-bim.shop
-      - LETSENCRYPT_EMAIL=contact@octa-bim.shop
       - PUBLIC_URL=https://meet.octa-bim.shop
     labels:
       dokploy.expose: "true"
       dokploy.ssl: "true"
       dokploy.domain: "meet.octa-bim.shop"
+
