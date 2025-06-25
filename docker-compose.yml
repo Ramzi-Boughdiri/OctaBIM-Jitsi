@@ -1,40 +1,41 @@
 version: '3'
 
 services:
-  prosody:
-    image: jitsi/prosody:stable-8719
-    restart: always
-    expose:
-      - '5222'
-      - '5347'
-      - '5280'
-    volumes:
-      - ./prosody/config:/config
-
-  jicofo:
-    image: jitsi/jicofo:stable-8719
-    restart: always
-    depends_on:
-      - prosody
-
-  jvb:
-    image: jitsi/jvb:stable-8719
-    restart: always
-    depends_on:
-      - prosody
-
   web:
-    image: jitsi/web:stable-8719
-    restart: always
-    depends_on:
-      - prosody
-      - jicofo
-      - jvb
-    volumes:
-      - ./web/custom:/usr/share/jitsi-meet/custom
+    image: jitsi/web:stable-5149-1
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
     environment:
+      - ENABLE_AUTH=0
+      - ENABLE_GUESTS=1
       - PUBLIC_URL=https://meet.octa-bim.shop
+    volumes:
+      - ./web-config:/config
+      - ./web-custom:/usr/share/jitsi-meet
+      - ./interface_config:/interface_config
     labels:
       dokploy.expose: "true"
       dokploy.ssl: "true"
       dokploy.domain: "meet.octa-bim.shop"
+
+  prosody:
+    image: jitsi/prosody:stable-5149-1
+    restart: unless-stopped
+    volumes:
+      - ./prosody-config:/config
+
+  jicofo:
+    image: jitsi/jicofo:stable-5149-1
+    restart: unless-stopped
+    volumes:
+      - ./jicofo-config:/config
+
+  jvb:
+    image: jitsi/jvb:stable-5149-1
+    restart: unless-stopped
+    ports:
+      - '10000:10000/udp'
+    volumes:
+      - ./jvb-config:/config
