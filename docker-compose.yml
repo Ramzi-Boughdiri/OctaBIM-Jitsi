@@ -2,7 +2,7 @@ version: '3'
 
 services:
   web:
-    image: jitsi/web:latest
+    image: jitsi/web:stable-8719
     restart: always
     ports:
       - '80:80'
