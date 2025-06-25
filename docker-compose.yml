@@ -1,27 +1,7 @@
 
 
 services:
-  traefik:
-    image: traefik:latest
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:9080"
-      - "--entrypoints.websecure.address=:9443"
-      - "--certificatesresolvers.le.acme.httpchallenge=true"
-      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.le.acme.email=contact@octa-bim.shop"
-      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "9080:9080"
-      - "9443:9443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./letsencrypt:/letsencrypt"
-    restart: unless-stopped
-    networks:
-      - jitsi
-
+  
   web:
     image: jitsi/web:stable-8719
     restart: unless-stopped
@@ -38,6 +18,7 @@ services:
       - "traefik.http.routers.jitsi.rule=Host(`meet.octa-bim.shop`)"
       - "traefik.http.routers.jitsi.entrypoints=websecure"
       - "traefik.http.routers.jitsi.tls.certresolver=le"
+      - "traefik.http.services.code.loadbalancer.server.port=9080"
     networks:
       - jitsi
 
