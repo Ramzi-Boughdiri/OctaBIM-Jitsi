@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.jitsi.rule=Host(`meet.octa-bim.shop`)"
       - "traefik.http.routers.jitsi.entrypoints=websecure"
       - "traefik.http.routers.jitsi.tls.certresolver=le"
-      - "traefik.http.services.code.loadbalancer.server.port=9080"
+      - "traefik.http.services.code.loadbalancer.server.port=8080"
     networks:
       - jitsi
 
